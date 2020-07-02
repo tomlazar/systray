@@ -34,6 +34,9 @@ type MenuItem struct {
 	// ClickedCh is the channel which will be notified when the menu item is clicked
 	ClickedCh chan struct{}
 
+	// OnClicked is the event to run when the clicked
+	OnClicked func()
+
 	// id uniquely identify a menu item, not supposed to be modified
 	id int32
 	// title is the text shown on menu item
@@ -59,6 +62,7 @@ func (item *MenuItem) String() string {
 func newMenuItem(title string, tooltip string, parent *MenuItem) *MenuItem {
 	return &MenuItem{
 		ClickedCh: make(chan struct{}),
+		OnClicked: nil,
 		id:        atomic.AddInt32(&currentID, 1),
 		title:     title,
 		tooltip:   tooltip,
@@ -202,9 +206,16 @@ func systrayMenuItemSelected(id int32) {
 		log.Errorf("No menu item with ID %v", id)
 		return
 	}
+
+	// set the channel
 	select {
 	case item.ClickedCh <- struct{}{}:
 	// in case no one waiting for the channel
 	default:
+	}
+
+	// call the built in event handler
+	if item.OnClicked != nil {
+		item.OnClicked()
 	}
 }
