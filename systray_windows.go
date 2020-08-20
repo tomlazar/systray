@@ -871,8 +871,8 @@ func (item *MenuItem) SetTemplateIcon(templateIconBytes []byte, regularIconBytes
 	item.SetIcon(regularIconBytes)
 }
 
-func addSeparator(id int32) {
-	err := wt.addSeparatorMenuItem(uint32(id), 0)
+func addSeparator(id int32, parent uint32) {
+	err := wt.addSeparatorMenuItem(uint32(id), parent)
 	if err != nil {
 		log.Errorf("Unable to addSeparator: %v", err)
 		return
